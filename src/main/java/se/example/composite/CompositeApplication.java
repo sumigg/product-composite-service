@@ -12,10 +12,13 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 @SpringBootApplication
 @ComponentScan("se.example")
 public class CompositeApplication {
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(CompositeApplication.class);
 
 	@Value("${api.common.version}")
 	String apiVersion;
@@ -40,6 +43,21 @@ public class CompositeApplication {
 	@Value("${api.common.contact.email}")
 	String apiContactEmail;
 
+	  private final Integer threadPoolSize; 
+      private final Integer taskQueueSize;
+
+	  public CompositeApplication(@Value("${app.thread.pool.size}") Integer threadPoolSize,
+								  @Value("${app.task.queue.size}") Integer taskQueueSize) {
+		this.threadPoolSize = threadPoolSize;
+		this.taskQueueSize = taskQueueSize;
+	  } 
+
+
+	  
+
+
+
+
 	 /**
   * Will exposed on $HOST:$PORT/swagger-ui.html
   *
@@ -62,6 +80,13 @@ public class CompositeApplication {
       .externalDocs(new ExternalDocumentation()
         .description(apiExternalDocDesc)
         .url(apiExternalDocUrl));
+  }
+
+
+  @Bean
+    public Scheduler publishEventScheduler() {
+    LOG.info("Creates a messagingScheduler with connectionPoolSize = {}", threadPoolSize);
+    return Schedulers.newBoundedElastic(threadPoolSize, taskQueueSize, "publish-pool");
   }
 
 

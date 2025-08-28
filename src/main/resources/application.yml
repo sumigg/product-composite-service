@@ -1,3 +1,6 @@
+
+
+
 springdoc:
   swagger-ui.path: /openapi/swagger-ui.html
   api-docs.path: /openapi/v3/api-docs
@@ -66,6 +69,8 @@ api:
 server.port: 7000
 server.error.include-message: always
 
+
+
 app:
   product-service:
     host: localhost
@@ -76,6 +81,39 @@ app:
   review-service:
     host: localhost
     port: 7003
+  thread.pool.size: 10
+  task.queue.size: 100
+
+
+spring.cloud.stream:
+  defaultBinder: kafka
+  default.contentType: application/json
+  bindings:
+    products-out-0:
+      destination: products
+      producer:
+        required-groups: auditGroup
+    recommendations-out-0:
+      destination: recommendations
+      producer:
+        required-groups: auditGroup
+    reviews-out-0:
+      destination: reviews
+      producer:
+        required-groups: auditGroup
+
+spring.cloud.stream.kafka.binder:
+  brokers: localhost
+  defaultBrokerPort: 9092
+
+spring.rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  username: guest
+  password: guest
+
+
+
 
 logging:
   level:
@@ -86,7 +124,7 @@ logging:
 
 spring.config.activate.on-profile: docker
 server.port: 8080
-
+spring.cloud.stream.kafka.binder.brokers: broker
 app:
   product-service:
     host: product-service
