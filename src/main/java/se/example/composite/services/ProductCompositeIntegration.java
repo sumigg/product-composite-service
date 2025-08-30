@@ -40,35 +40,27 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   private final WebClient webClient;
   private final ObjectMapper mapper;
 
-  private final String productServiceUrl;
-  private final String recommendationServiceUrl;
-  private final String reviewServiceUrl;
-
   private final Scheduler publishEventScheduler;   
 
   private final  StreamBridge streamBridge;
+
+  private static final String PRODUCT_SERVICE_URL = "http://product-service";
+  private static final String RECOMMENDATION_SERVICE_URL = "http://recommendation-service";
+  private static final String REVIEW_SERVICE_URL = "http://review-service";
 
   @Autowired
   public ProductCompositeIntegration(
     WebClient.Builder webClient,
     ObjectMapper mapper,
       StreamBridge streamBridge,
-      Scheduler publishEventScheduler,
-      @Value("${app.product-service.host}") String productServiceHost,
-      @Value("${app.product-service.port}") int productServicePort,
-      @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-      @Value("${app.recommendation-service.port}") int recommendationServicePort,
-      @Value("${app.review-service.host}") String reviewServiceHost,
-      @Value("${app.review-service.port}") int reviewServicePort) {
+      Scheduler publishEventScheduler) {
 
     this.webClient = webClient.build();
     this.mapper = mapper;
     this.streamBridge = streamBridge;
     this.publishEventScheduler = publishEventScheduler;
 
-    productServiceUrl = "http://" + productServiceHost + ":" + productServicePort;
-    recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort;
-    reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort;
+
   }
 
   @Override
@@ -84,7 +76,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   @Override
   public Mono<Product> getProduct(int productId) {
 
-    String url = productServiceUrl + "/product/" + productId;
+    String url = PRODUCT_SERVICE_URL + "/product/" + productId;
     LOG.debug("Will call the getProduct API on URL: {}", url);
 
      Mono<Product> result  = webClient.get().uri(url).retrieve().bodyToMono(Product.class).log(LOG.getName(), FINE)
@@ -112,7 +104,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
   @Override
   public Flux<Recommendation> getRecommendations(int productId) {
-    String url = recommendationServiceUrl + "/recommendation"+"?productId=" + productId;
+    String url = RECOMMENDATION_SERVICE_URL + "/recommendation"+"?productId=" + productId;
     LOG.debug("Will call the getRecommendations API on URL: {}", url);
       Flux<Recommendation> result  =webClient.get()
         .uri(url)
@@ -141,7 +133,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   @Override
   public Flux<Review> getReviews(int productId) {
 
-    String url = reviewServiceUrl + "/review"+"?productId=" + productId;
+    String url = REVIEW_SERVICE_URL + "/review"+"?productId=" + productId;
     LOG.debug("Will call the getReviews API on URL: {}", url);
        Flux<Review> result = webClient.get()
         .uri(url)
