@@ -10,6 +10,9 @@ springdoc:
   api-docs.path: /openapi/v3/api-docs
   packagesToScan: se.example.composite
   pathsToMatch: /**
+  cache.disabled: true
+server.forward-headers-strategy: framework
+
 
 api:
 
