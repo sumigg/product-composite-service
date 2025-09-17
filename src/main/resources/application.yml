@@ -11,8 +11,18 @@ springdoc:
   packagesToScan: se.example.composite
   pathsToMatch: /**
   cache.disabled: true
-server.forward-headers-strategy: framework
 
+  swagger-ui:
+    oauth2-redirect-url: /swagger-ui/oauth2-redirect.html
+    oauth:
+      clientId: writer
+      clientSecret: secret-writer
+      useBasicAuthenticationWithAccessCodeGrant: true
+  oAuthFlow:
+    authorizationUrl: https://localhost:8443/oauth2/authorize
+    tokenUrl: https://localhost:8443/oauth2/token
+
+server.forward-headers-strategy: framework
 
 api:
 
@@ -116,12 +126,19 @@ spring:
     name: product-composite-service
 
 
+
+
 app.eureka-server: localhost
+app.eureka-username: u
+app.eureka-password: p
+app.auth-server: localhost
+
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${app.auth-server}:9999
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${app.eureka-server}:8761/eureka/
+      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
@@ -145,3 +162,4 @@ spring.cloud.stream.kafka.binder.brokers: broker
 
 
 app.eureka-server: eureka
+app.auth-server: auth-server
